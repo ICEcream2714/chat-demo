@@ -1,7 +1,24 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import io from "socket.io-client";
-import { Button } from "@mui/material";
+import {
+  Button,
+  Avatar,
+  List,
+  ListItem,
+  ListItemAvatar,
+  ListItemText,
+  Select,
+  MenuItem,
+  FormControl,
+  InputLabel,
+  ListItemIcon,
+  Box,
+  Typography,
+  TextField,
+  Paper,
+} from "@mui/material";
 import "./App.css";
+import Divider from "@mui/material/Divider";
 
 function App() {
   const [socket, setSocket] = useState(null);
@@ -10,6 +27,7 @@ function App() {
   const [currentUser, setCurrentUser] = useState(null);
   const [users, setUsers] = useState([]);
   const [currentChannel, setCurrentChannel] = useState("public");
+  const messagesEndRef = useRef(null);
 
   // Initialize socket connection
   useEffect(() => {
@@ -45,6 +63,29 @@ function App() {
     };
   }, []);
 
+  useEffect(() => {
+    if (socket) {
+      socket.on("history_response", ({ channel, history }) => {
+        setMessages((prev) => ({
+          ...prev,
+          [channel]: history,
+        }));
+      });
+    }
+  }, [socket]);
+
+  useEffect(() => {
+    if (socket && currentChannel) {
+      socket.emit("request_history", { channel: currentChannel });
+    }
+  }, [socket, currentChannel]);
+
+  useEffect(() => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: "smooth" });
+    }
+  }, [messages, currentChannel]);
+
   const sendMessage = () => {
     if (input.trim() && socket && currentUser) {
       const recipient =
@@ -79,86 +120,150 @@ function App() {
         <div className="sidebar-header">
           <h2>Chat App</h2>
         </div>
+        <Divider />
 
         <div className="channel-list">
-          <button
-            className={`channel-btn ${
-              currentChannel === "public" ? "active" : ""
-            }`}
-            onClick={() => handleChannelChange("public")}
-          >
-            Public Channel
-          </button>
-          {users
-            .filter((u) => u !== currentUser)
-            .map((user) => {
-              const channel = [currentUser, user]
-                .sort()
-                .join(":")
-                .toLowerCase();
-              return (
-                <button
-                  key={user}
-                  className={`channel-btn ${
-                    currentChannel === channel ? "active" : ""
-                  }`}
-                  onClick={() => handleChannelChange(channel)}
-                >
-                  {user}
-                </button>
-              );
-            })}
+          <List>
+            <ListItem
+              button
+              selected={currentChannel === "public"}
+              onClick={() => handleChannelChange("public")}
+            >
+              <ListItemText primary="Public Channel" />
+            </ListItem>
+            {users
+              .filter((u) => u !== currentUser)
+              .map((user) => {
+                const channel = [currentUser, user]
+                  .sort()
+                  .join(":")
+                  .toLowerCase();
+                return (
+                  <ListItem
+                    button
+                    key={user}
+                    selected={currentChannel === channel}
+                    onClick={() => handleChannelChange(channel)}
+                  >
+                    <ListItemAvatar>
+                      <Avatar>{user.charAt(0).toUpperCase()}</Avatar>
+                    </ListItemAvatar>
+                    <ListItemText primary={user} />
+                  </ListItem>
+                );
+              })}
+          </List>
         </div>
+        <Divider />
         <div className="user-select">
-          <label>Current User:</label>
-          <select
-            value={currentUser}
-            onChange={(e) => setCurrentUser(e.target.value)}
-          >
-            {users.map((user) => (
-              <option key={user} value={user}>
-                {user}
-              </option>
-            ))}
-          </select>
+          <FormControl fullWidth>
+            <InputLabel>Current User</InputLabel>
+            <Select
+              value={currentUser}
+              onChange={(e) => setCurrentUser(e.target.value)}
+              label="Current User"
+              renderValue={(selected) => (
+                <div style={{ display: "flex", alignItems: "center" }}>
+                  <Avatar style={{ marginRight: 8 }}>
+                    {selected.charAt(0).toUpperCase()}
+                  </Avatar>
+                  {selected}
+                </div>
+              )}
+            >
+              {users.map((user) => (
+                <MenuItem key={user} value={user}>
+                  <ListItemIcon>
+                    <Avatar sx={{ marginRight: 2 }}>
+                      {user.charAt(0).toUpperCase()}
+                    </Avatar>
+                  </ListItemIcon>
+                  {user}
+                </MenuItem>
+              ))}
+            </Select>
+          </FormControl>
         </div>
       </div>
 
-      <div className="chat-area">
-        <div className="chat-header">
-          <h3>
+      <Box className="chat-area" display="flex" flexDirection="column" flex={1}>
+        <Paper className="chat-header" elevation={1} square>
+          <Typography variant="h6">
             {currentChannel === "public"
               ? "Welcome to Public Channel"
               : `Chatting with ${currentChannel
                   .split(":")
                   .find((u) => u !== currentUser)}`}
-          </h3>
-        </div>
-        <div className="messages-container">
-          {messages[currentChannel]?.map((msg, index) => (
-            <div
-              key={index}
-              className={`message ${
-                msg.startsWith(currentUser) ? "sent" : "received"
-              }`}
-            >
-              {msg}
-            </div>
-          ))}
-        </div>
-        <div className="input-container">
-          <input
-            type="text"
+          </Typography>
+        </Paper>
+        <Box className="messages-container" flex={1} p={2} overflow="auto">
+          {messages[currentChannel]?.map((msg, index) => {
+            const displayedText = msg.includes(": ")
+              ? msg.split(": ").slice(1).join(": ")
+              : msg;
+            const sender = msg.includes(": ")
+              ? msg.split(": ")[0]
+              : currentUser;
+            const isSent = sender === currentUser;
+
+            return (
+              <Box
+                key={index}
+                display="flex"
+                flexDirection={isSent ? "row-reverse" : "row"}
+                alignItems="center"
+                mb={2}
+              >
+                <Avatar
+                  sx={{
+                    width: 32,
+                    height: 32,
+                    mr: isSent ? 0 : 1,
+                    ml: isSent ? 1 : 0,
+                  }}
+                >
+                  {sender.charAt(0).toUpperCase()}
+                </Avatar>
+                <Box
+                  className={`message ${isSent ? "sent" : "received"}`}
+                  p={1}
+                  borderRadius={2}
+                  maxWidth="30%"
+                  bgcolor={isSent ? "primary.main" : "grey.300"}
+                  color={isSent ? "primary.contrastText" : "text.primary"}
+                >
+                  {displayedText}
+                </Box>
+              </Box>
+            );
+          })}
+          <div ref={messagesEndRef} />
+        </Box>
+        <Box
+          className="input-container"
+          display="flex"
+          p={2}
+          borderTop={1}
+          borderColor="divider"
+        >
+          <TextField
+            fullWidth
+            variant="outlined"
             value={input}
             onChange={(e) => setInput(e.target.value)}
             onKeyPress={handleKeyPress}
             placeholder="Type a message..."
           />
-          <Button onClick={sendMessage} variant="contained">
+          <Button
+            onClick={sendMessage}
+            variant="contained"
+            color="primary"
+            sx={{ ml: 2 }}
+          >
             Send
           </Button>
-        </div>
-      </div>
+        </Box>
+      </Box>
     </div>
   );
 }

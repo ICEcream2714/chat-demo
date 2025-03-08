@@ -1,7 +1,6 @@
 .app {
   display: flex;
   height: 100vh;
-  /* max-width: 1200px; */
   margin: 0 auto;
   font-family: Arial, sans-serif;
 }
@@ -22,20 +21,6 @@
   color: #333;
 }
 
-.user-select label {
-  display: block;
-  margin-bottom: 5px;
-  font-weight: bold;
-}
-
-.user-select select {
-  width: 100%;
-  padding: 8px;
-  font-size: 1rem;
-  border-radius: 4px;
-  border: 1px solid #ddd;
-}
-
 .channel-list {
   display: flex;
   flex-direction: column;
@@ -43,40 +28,16 @@
   flex: 1;
 }
 
-.channel-btn {
-  padding: 10px;
-  text-align: left;
-  background: white;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: all 0.2s;
-}
-
-.channel-btn:hover {
-  background: #e0e0e0;
-}
-
-.channel-btn.active {
-  background: #007bff;
-  color: white;
-  border-color: #007bff;
-}
-
 .chat-area {
   flex: 1;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 .chat-header {
   padding: 15px 20px;
   border-bottom: 1px solid #ddd;
-}
-
-.chat-header h3 {
-  margin: 0;
-  color: #333;
 }
 
 .messages-container {
@@ -112,14 +73,6 @@
   gap: 10px;
   border-top: 1px solid #ddd;
   background: #fff;
-}
-
-.input-container input {
-  flex: 1;
-  padding: 10px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 1rem;
 }
 
 .loading {

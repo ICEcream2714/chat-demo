@@ -4,6 +4,7 @@ const express = require("express");
 const { createServer } = require("http");
 const { Server } = require("socket.io");
 const { createClient } = require("redis");
+const { MongoClient } = require("mongodb");
 
 const app = express();
 const httpServer = createServer(app);
@@ -11,7 +12,7 @@ const io = new Server(httpServer, { cors: { origin: "*" } });
 const PORT = process.env.PORT || 3000;
 
 // Demo users
-const users = ["one", "two", "three"];
+const users = ["alice", "bro", "charlie"];
 const publicChannel = "public";
 
 // Connect to Redis
@@ -28,10 +29,16 @@ redisSubscriber.on("error", (err) =>
   console.error("Redis Subscriber Error:", err)
 );
 
+let messagesCollection;
+
 (async () => {
   try {
     await redisPublisher.connect();
     await redisSubscriber.connect();
+
+    const mongoClient = new MongoClient(process.env.MONGO_URI);
+    await mongoClient.connect();
+    messagesCollection = mongoClient.db("chatdemo").collection("messages");
 
     await redisSubscriber.subscribe(publicChannel, (message) => {
       io.emit("new_message", { channel: publicChannel, message });
@@ -91,10 +98,28 @@ io.on("connection", (socket) => {
 
       // Publish the message to the channel in Redis
       await redisPublisher.publish(channel, `${sender}: ${message}`);
+
+      // Insert the message into MongoDB
+      await messagesCollection.insertOne({
+        channel,
+        text: `${sender}: ${message}`,
+        timestamp: new Date(),
+      });
     } catch (err) {
       console.error("Error sending message:", err.message);
       socket.emit("error", "Failed to send message");
     }
+  });
+
+  socket.on("request_history", async ({ channel }) => {
+    const history = await messagesCollection
+      .find({ channel })
+      .sort({ timestamp: 1 })
+      .toArray();
+    socket.emit("history_response", {
+      channel,
+      history: history.map((item) => item.text),
+    });
   });
 
   socket.on("disconnect", () => {
