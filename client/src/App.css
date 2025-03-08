@@ -56,3 +56,48 @@ button {
 button:hover {
   background-color: #0056b3;
 }
+.App {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+.chat-container {
+  border: 1px solid #ccc;
+  padding: 10px;
+  height: 300px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+}
+
+.message {
+  padding: 5px;
+  border-bottom: 1px solid #eee;
+}
+
+.input-container {
+  display: flex;
+  gap: 10px;
+}
+
+.topic-container {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.subscribed-topics {
+  margin-bottom: 20px;
+}
+
+.topic-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 5px;
+  border-bottom: 1px solid #eee;
+}
+
+input, button {
+  padding: 5px;
+}
