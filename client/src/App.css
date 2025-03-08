@@ -1,58 +1,131 @@
-body {
+.app {
   display: flex;
-  justify-content: center;
-  align-items: center;
   height: 100vh;
-  margin: 0;
-}
-
-.App {
-  max-width: 600px;
-  margin: 20px auto;
+  /* max-width: 1200px; */
+  margin: 0 auto;
   font-family: Arial, sans-serif;
 }
 
-h1 {
-  text-align: center;
+.sidebar {
+  width: 250px;
+  background: #f5f5f5;
+  padding: 20px;
+  border-right: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.sidebar-header h2 {
+  margin: 0;
+  font-size: 1.5rem;
   color: #333;
 }
 
-.chat-container {
-  border: 1px solid #ccc;
+.user-select label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+}
+
+.user-select select {
+  width: 100%;
+  padding: 8px;
+  font-size: 1rem;
+  border-radius: 4px;
+  border: 1px solid #ddd;
+}
+
+.channel-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  flex: 1;
+}
+
+.channel-btn {
   padding: 10px;
-  height: 400px;
+  text-align: left;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.channel-btn:hover {
+  background: #e0e0e0;
+}
+
+.channel-btn.active {
+  background: #007bff;
+  color: white;
+  border-color: #007bff;
+}
+
+.chat-area {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.chat-header {
+  padding: 15px 20px;
+  border-bottom: 1px solid #ddd;
+}
+
+.chat-header h3 {
+  margin: 0;
+  color: #333;
+}
+
+.messages-container {
+  flex: 1;
+  padding: 20px;
   overflow-y: auto;
-  background-color: rgb(46, 39, 39);
+  background: #fff;
 }
 
 .message {
-  padding: 8px;
+  padding: 10px 15px;
   margin: 5px 0;
-  background-color: rgb(214, 60, 60);
-  border-radius: 5px;
+  border-radius: 8px;
+  max-width: 30%;
+  word-wrap: break-word;
+}
+
+.sent {
+  background: #007bff;
+  color: white;
+  margin-left: auto;
+}
+
+.received {
+  background: #e9ecef;
+  color: #333;
+  margin-right: auto;
 }
 
 .input-container {
   display: flex;
-  margin-top: 10px;
+  padding: 20px;
+  gap: 10px;
+  border-top: 1px solid #ddd;
+  background: #fff;
 }
 
-input {
+.input-container input {
   flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px 0 0 4px;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 1rem;
 }
 
-button {
-  padding: 8px 16px;
-  border: none;
-  background-color: #007bff;
-  color: white;
-  border-radius: 0 4px 4px 0;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #0056b3;
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+  font-size: 1.2rem;
 }
