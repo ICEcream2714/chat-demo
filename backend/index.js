@@ -39,7 +39,9 @@ io.on("connection", (socket) => {
   userTopics.set(socket.id, new Set());
 
   socket.on("subscribe", async (topic) => {
-    console.log(`Received subscribe request for topic: ${topic} from ${socket.id}`);
+    console.log(
+      `Received subscribe request for topic: ${topic} from ${socket.id}`
+    );
     try {
       const userTopicSet = userTopics.get(socket.id);
       if (!userTopicSet.has(topic)) {
@@ -52,7 +54,9 @@ io.on("connection", (socket) => {
             const subscribers = topicSubscriptions.get(topic);
             if (subscribers) {
               subscribers.forEach((socketId) => {
-                console.log(`Emitting to ${socketId} for topic ${topic}: ${message}`);
+                console.log(
+                  `Emitting to ${socketId} for topic ${topic}: ${message}`
+                );
                 io.to(socketId).emit("new_message", { topic, message });
               });
             } else {
@@ -81,41 +85,49 @@ io.on("connection", (socket) => {
     if (userTopicSet?.has(topic)) {
       userTopicSet.delete(topic);
       const subscribers = topicSubscriptions.get(topic);
-  
+
       if (subscribers) {
         subscribers.delete(socket.id);
         console.log(`${socket.id} unsubscribed from ${topic}`);
-        
+
         // If no more subscribers, remove topic subscription from Redis
         if (subscribers.size === 0) {
           await redisSubscriber.unsubscribe(topic);
           topicSubscriptions.delete(topic);
-          console.log(`Redis unsubscribed from topic: ${topic} (no subscribers left)`);
+          console.log(
+            `Redis unsubscribed from topic: ${topic} (no subscribers left)`
+          );
         }
       }
-      
+
       socket.emit("unsubscribed", topic);
       socket.emit("topics", Array.from(userTopicSet));
     }
   });
-  
 
   socket.on("send_message", async ({ topic, message }) => {
     if (!topic || !message) {
       console.log("Invalid message data:", { topic, message });
       return;
     }
-  
+
     // Check if the user is subscribed before allowing them to send messages
     const userTopicSet = userTopics.get(socket.id);
     if (!userTopicSet || !userTopicSet.has(topic)) {
-      console.log(`User ${socket.id} attempted to send message to unsubscribed topic: ${topic}`);
-      socket.emit("error", `You are not subscribed to ${topic} and cannot send messages.`);
+      console.log(
+        `User ${socket.id} attempted to send message to unsubscribed topic: ${topic}`
+      );
+      socket.emit(
+        "error",
+        `You are not subscribed to ${topic} and cannot send messages.`
+      );
       return;
     }
-  
+
     try {
-      console.log(`Publishing message to ${topic}: ${message} from ${socket.id}`);
+      console.log(
+        `Publishing message to ${topic}: ${message} from ${socket.id}`
+      );
       await redisPublisher.publish(topic, message);
       await redisStorage.lPush(`history:${topic}`, message);
       await redisStorage.lTrim(`history:${topic}`, 0, 99);
@@ -124,8 +136,6 @@ io.on("connection", (socket) => {
       socket.emit("error", "Failed to send message");
     }
   });
-  
-  
 
   socket.on("disconnect", () => {
     console.log(`User disconnected: ${socket.id}`);
@@ -137,7 +147,9 @@ io.on("connection", (socket) => {
           subscribers.delete(socket.id);
           if (subscribers.size === 0) {
             redisSubscriber.unsubscribe(topic).then(() => {
-              console.log(`Redis unsubscribed from topic: ${topic} (no subscribers left)`);
+              console.log(
+                `Redis unsubscribed from topic: ${topic} (no subscribers left)`
+              );
             });
             topicSubscriptions.delete(topic);
           }

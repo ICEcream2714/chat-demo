@@ -1,103 +1,231 @@
+:root {
+  --primary: #007bff;
+  --secondary: #6c757d;
+  --background: #f5f5f5;
+  --text: #333;
+  --success: #28a745;
+  --danger: #dc3545;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
 body {
+  font-family: "Segoe UI", Arial, sans-serif;
+  background: var(--background);
+  color: var(--text);
+  line-height: 1.6;
+  max-height: 100%;
   display: flex;
   justify-content: center;
-  align-items: center;
-  height: 100vh;
-  margin: 0;
 }
 
 .App {
-  max-width: 600px;
-  margin: 20px auto;
-  font-family: Arial, sans-serif;
+  width: 650px;
+  margin: 20px;
+  padding: 20px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
-h1 {
-  text-align: center;
-  color: #333;
+.app-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 10px;
+  border-bottom: 1px solid #eee;
 }
 
-.chat-container {
-  border: 1px solid #ccc;
+.status {
+  padding: 4px 8px;
+  border-radius: 12px;
+  font-size: 0.9em;
+}
+
+.status.connected {
+  background: var(--success);
+  color: white;
+}
+
+.status.disconnected {
+  background: var(--danger);
+  color: white;
+}
+
+.error-message {
+  background: var(--danger);
+  color: white;
   padding: 10px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.topic-section {
+  margin-bottom: 30px;
+}
+
+.topic-input {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.topics-list h3 {
+  margin-bottom: 10px;
+  color: var(--primary);
+}
+
+.topics-list ul {
+  list-style: none;
+}
+
+.topics-list li {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 8px 12px;
+  margin: 4px 0;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.topics-list li:hover {
+  background: #f0f0f0;
+}
+
+.topics-list li.active {
+  background: var(--primary);
+  color: white;
+}
+
+.unsubscribe-btn {
+  background: none !important;
+  color: var(--secondary);
+  border: none;
+  font-size: 1.2em;
+  padding: 0 8px !important;
+}
+
+.unsubscribe-btn:hover {
+  color: var(--danger) !important;
+}
+
+.chat-section {
+  background: #fff;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
   height: 400px;
+}
+
+.chat-header {
+  background: var(--primary);
+  color: white;
+  padding: 10px 15px;
+}
+
+.messages-container {
+  flex: 1;
   overflow-y: auto;
-  background-color: rgb(46, 39, 39);
+  padding: 15px;
+  background: #fafafa;
+  width: 100%;
+
+  &::-webkit-scrollbar {
+    width: 0px; /* Width of the scrollbar */
+  }
+  &::-webkit-scrollbar-track {
+    background: rgb(65, 23, 23); /* Color of the track (background) */
+    border-radius: 0px;
+  }
 }
 
 .message {
-  padding: 8px;
-  margin: 5px 0;
-  background-color: rgb(214, 60, 60);
-  border-radius: 5px;
+  padding: 8px 12px;
+  margin: 4px 0;
+  background: white;
+  border-radius: 4px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  word-break: break-word; /* Break long words */
+  overflow-wrap: break-word; /* Modern browsers */
+  max-width: 100%; /* Ensure it doesn't exceed container */
+  display: flex;
+  flex-direction: column;
 }
 
-.input-container {
+.message span {
+  word-break: break-word;
+  overflow-wrap: break-word;
+  max-width: 100%;
+}
+
+.no-messages {
+  text-align: center;
+  padding: 20px;
+  color: var(--secondary);
+}
+
+.message-input {
   display: flex;
-  margin-top: 10px;
+  padding: 15px;
+  border-top: 1px solid #eee;
+  width: 100%;
 }
 
 input {
   flex: 1;
-  padding: 8px;
-  border: 1px solid #ccc;
+  padding: 10px;
+  border: 1px solid #ddd;
   border-radius: 4px 0 0 4px;
+  outline: none;
+  background: #fafafa;
+  color: var(--text);
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+input:focus {
+  border-color: var(--primary);
 }
 
 button {
-  padding: 8px 16px;
-  border: none;
-  background-color: #007bff;
+  padding: 10px 20px;
+  background: var(--primary);
   color: white;
+  border: none;
   border-radius: 0 4px 4px 0;
   cursor: pointer;
+  transition: background 0.2s;
 }
 
-button:hover {
-  background-color: #0056b3;
-}
-.App {
-  max-width: 800px;
-  margin: 0 auto;
-  padding: 20px;
+button:hover:not(:disabled) {
+  background: #0056b3;
 }
 
-.chat-container {
-  border: 1px solid #ccc;
-  padding: 10px;
-  height: 300px;
-  overflow-y: auto;
-  margin-bottom: 20px;
+button:disabled {
+  background: var(--secondary);
+  cursor: not-allowed;
 }
 
-.message {
-  padding: 5px;
-  border-bottom: 1px solid #eee;
-}
+/* Media query for smaller screens */
+@media (max-width: 600px) {
+  .App {
+    margin: 10px;
+    padding: 15px;
+  }
 
-.input-container {
-  display: flex;
-  gap: 10px;
-}
+  .message {
+    padding: 6px 10px;
+  }
 
-.topic-container {
-  display: flex;
-  gap: 10px;
-  margin-bottom: 20px;
-}
-
-.subscribed-topics {
-  margin-bottom: 20px;
-}
-
-.topic-item {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 5px;
-  border-bottom: 1px solid #eee;
-}
-
-input, button {
-  padding: 5px;
+  .message-input {
+    padding: 10px;
+  }
 }
